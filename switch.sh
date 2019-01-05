@@ -2,13 +2,13 @@
 
 SPEAKERS="alsa_output.pci-0000_0d_00.3.iec958-stereo"
 HEADSET="alsa_output.pci-0000_0d_00.3.analog-stereo"
-ACTIVE_SINK=$(pactl list short | grep RUNNING | sed -e 's,^\([0-9][0-9]*\)[^0-9].*,\1,')
+ACTIVE_SINK=$(pactl list short | grep -E '^(6.)|(alsa_output.pci-0000_0d_00.3*)' | grep -w RUNNING | sed -e 's,^\([0-9][0-9]*\)[^0-9].*,\1,')
 
-if [ "$ACTIVE_SINK" = "4" ]; then
+if [ "$ACTIVE_SINK" = "7" ]; then
 	(
 	echo set-default-sink $SPEAKERS
-	echo "[*] Switching to Speakers."
-	
+	notify-send 'Switching to Speakers.' --icon=dialog-information
+		
 	pacmd list-sink-inputs |
 		grep -E '^\s*index:' |
 		grep -oE '[0-9]+' |
@@ -18,10 +18,10 @@ if [ "$ACTIVE_SINK" = "4" ]; then
 	done
 	) | pacmd > /dev/null
 	
-else
+elif [ "$ACTIVE_SINK" = "6" ]; then
 	(
 	echo set-default-sink $HEADSET
-	echo "[*] Switching to headphones."
+	notify-send 'Switching to Headphones.' --icon=dialog-information
 	
 	pacmd list-sink-inputs |
 		grep -E '^\s*index:' |
@@ -34,4 +34,6 @@ else
 fi
 
 exit 0
+
+
 
